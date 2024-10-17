@@ -43,62 +43,39 @@ def _parse_aseg_header(f: Path) -> pd.DataFrame:
         if "Measure BrainSeg, BrainSegVol" in line:
             dfs.append(pd.DataFrame({"BrainSegVol": [_get_float(line)]}))
         elif "Measure BrainSegNotVent, BrainSegVolNotVent" in line:
-            dfs.append(
-                pd.DataFrame({"BrainSegVolNotVent": [_get_float(line)]})
-            )
+            dfs.append(pd.DataFrame({"BrainSegVolNotVent": [_get_float(line)]}))
         elif "Measure BrainSegNotVentSurf, BrainSegVolNotVentSurf" in line:
-            dfs.append(
-                pd.DataFrame({"BrainSegVolNotVentSurf": [_get_float(line)]})
-            )
+            dfs.append(pd.DataFrame({"BrainSegVolNotVentSurf": [_get_float(line)]}))
         elif "Measure Cortex, CortexVol" in line:
             dfs.append(pd.DataFrame({"CortexVol": [_get_float(line)]}))
         elif "Measure SupraTentorial, SupraTentorialVol" in line:
             dfs.append(pd.DataFrame({"SupraTentorialVol": [_get_float(line)]}))
         elif "Measure SupraTentorialNotVent, SupraTentorialVolNotVent" in line:
-            dfs.append(
-                pd.DataFrame({"SupraTentorialVolNotVent": [_get_float(line)]})
-            )
+            dfs.append(pd.DataFrame({"SupraTentorialVolNotVent": [_get_float(line)]}))
         elif "Measure EstimatedTotalIntraCranialVol, eTIV" in line:
             dfs.append(pd.DataFrame({"eTIV": [_get_float(line)]}))
         elif "Measure VentricleChoroidVol, VentricleChoroidVol" in line:
-            dfs.append(
-                pd.DataFrame({"VentricleChoroidVol": [_get_float(line)]})
-            )
+            dfs.append(pd.DataFrame({"VentricleChoroidVol": [_get_float(line)]}))
         elif "Measure lhCortex, lhCortexVol" in line:
             dfs.append(pd.DataFrame({"lhCortexVol": [_get_float(line)]}))
         elif "Measure rhCortex, rhCortexVol" in line:
             dfs.append(pd.DataFrame({"rhCortexVol": [_get_float(line)]}))
         elif "Measure lhCerebralWhiteMatter, lhCerebralWhiteMatterVol" in line:
-            dfs.append(
-                pd.DataFrame({"lhCerebralWhiteMatterVol": [_get_float(line)]})
-            )
+            dfs.append(pd.DataFrame({"lhCerebralWhiteMatterVol": [_get_float(line)]}))
         elif "Measure rhCerebralWhiteMatter, rhCerebralWhiteMatterVol" in line:
-            dfs.append(
-                pd.DataFrame({"rhCerebralWhiteMatterVol": [_get_float(line)]})
-            )
+            dfs.append(pd.DataFrame({"rhCerebralWhiteMatterVol": [_get_float(line)]}))
         elif "Measure CerebralWhiteMatter, CerebralWhiteMatterVol" in line:
-            dfs.append(
-                pd.DataFrame({"CerebralWhiteMatterVol": [_get_float(line)]})
-            )
+            dfs.append(pd.DataFrame({"CerebralWhiteMatterVol": [_get_float(line)]}))
         elif "Measure SubCortGray, SubCortGrayVol" in line:
             dfs.append(pd.DataFrame({"SubCortGrayVol": [_get_float(line)]}))
         elif "Measure TotalGray, TotalGrayVol" in line:
             dfs.append(pd.DataFrame({"TotalGrayVol": [_get_float(line)]}))
-        elif (
-            "Measure SupraTentorialNotVentVox, SupraTentorialVolNotVentVox"
-            in line
-        ):
-            dfs.append(
-                pd.DataFrame(
-                    {"SupraTentorialVolNotVentVox": [_get_float(line)]}
-                )
-            )
+        elif "Measure SupraTentorialNotVentVox, SupraTentorialVolNotVentVox" in line:
+            dfs.append(pd.DataFrame({"SupraTentorialVolNotVentVox": [_get_float(line)]}))
         elif "Measure Mask, MaskVol" in line:
             dfs.append(pd.DataFrame({"MaskVol": [_get_float(line)]}))
         elif "BrainSegVol-to-eTIV, BrainSegVol-to-eTIV" in line:
-            dfs.append(
-                pd.DataFrame({"BrainSegVol-to-eTIV": [_get_float(line)]})
-            )
+            dfs.append(pd.DataFrame({"BrainSegVol-to-eTIV": [_get_float(line)]}))
         elif "MaskVol-to-eTIV" in line:
             dfs.append(pd.DataFrame({"Mask-to-eTIV": [_get_float(line)]}))
         elif "lhSurfaceHoles" in line:
@@ -169,9 +146,7 @@ def parse_all_aparc(root: Path) -> pd.DataFrame:
                 "aparc.a2009s",
             ]:
                 aparc.append(
-                    parse_aparc(
-                        subsesdir / "stats" / f"{hemi}.{parc}.stats"
-                    ).assign(hemisphere=hemi, parc=parc)
+                    parse_aparc(subsesdir / "stats" / f"{hemi}.{parc}.stats").assign(hemisphere=hemi, parc=parc)
                 )
 
     return pd.concat(aparc, ignore_index=True)
@@ -180,14 +155,8 @@ def parse_all_aparc(root: Path) -> pd.DataFrame:
 def parse_all_aseg(root: Path) -> pd.DataFrame:
     aseg = []
     for subsesdir in root.glob("sub*"):
-        aseg.append(
-            parse_aseg(subsesdir / "stats" / "aseg.stats").assign(seg="aseg")
-        )
-        aseg.append(
-            parse_aseg(subsesdir / "stats" / "wmparc.stats").assign(
-                seg="wmparc"
-            )
-        )
+        aseg.append(parse_aseg(subsesdir / "stats" / "aseg.stats").assign(seg="aseg"))
+        aseg.append(parse_aseg(subsesdir / "stats" / "wmparc.stats").assign(seg="wmparc"))
 
     return pd.concat(aseg, ignore_index=True)
 

@@ -44,7 +44,6 @@ maps = (
 
 
 def main(root: Path, db: str):
-
     mapper = mapping.Mapper(
         maps=maps,
         db=db,

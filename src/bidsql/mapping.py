@@ -67,9 +67,7 @@ def is_file_in_session(src: Path, session: orm.Session) -> bool:
     return is_in
 
 
-def attempt_map(
-    src: Path, incoming_to_natives: typing.Sequence[File], session: orm.Session
-) -> None:
+def attempt_map(src: Path, incoming_to_natives: typing.Sequence[File], session: orm.Session) -> None:
     if is_file_in_session(src=src, session=session):
         logging.info(f"{src} already in database")
         return
@@ -88,11 +86,7 @@ def get_add_participant_session(
     session_id: str | None = None,
 ) -> tuple[models.Participant | None, models.Session | None]:
     dataset = models.Dataset.from_session(session)
-    participant = (
-        upsert_participant(session, id=participant_id, dataset=dataset)
-        if participant_id
-        else None
-    )
+    participant = upsert_participant(session, id=participant_id, dataset=dataset) if participant_id else None
     if participant and session_id:
         ses = upsert_session(
             session,
@@ -106,15 +100,11 @@ def get_add_participant_session(
     return participant, ses
 
 
-def upsert_participant(
-    session: orm.Session, id: str, dataset: models.Dataset
-) -> models.Participant:
+def upsert_participant(session: orm.Session, id: str, dataset: models.Dataset) -> models.Participant:
     try:
         participant = models.Participant.from_session(session, id=id)
     except exc.NoResultFound:
-        logging.info(
-            f"Unable to find participant {id} in session; attempting to add"
-        )
+        logging.info(f"Unable to find participant {id} in session; attempting to add")
         participant = models.Participant(id=id, dataset=dataset)
         session.add(participant)
     return participant
@@ -127,13 +117,9 @@ def upsert_session(
     dataset: models.Dataset,
 ) -> models.Session:
     try:
-        ses = models.Session.from_session(
-            session, id=id, participant_id=participant.id
-        )
+        ses = models.Session.from_session(session, id=id, participant_id=participant.id)
     except Exception:
-        logging.info(
-            f"Unable to find session {id} in session; attempting to add"
-        )
+        logging.info(f"Unable to find session {id} in session; attempting to add")
         ses = models.Session(id=id, dataset=dataset, participant=participant)
         session.add(ses)
     return ses

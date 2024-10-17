@@ -39,9 +39,7 @@ class Dataset(Base):
         passive_deletes=True,
         default_factory=list,
     )
-    id: orm.Mapped[uuid.UUID] = orm.mapped_column(
-        primary_key=True, default_factory=uuid.uuid4, init=False
-    )
+    id: orm.Mapped[uuid.UUID] = orm.mapped_column(primary_key=True, default_factory=uuid.uuid4, init=False)
 
     @classmethod
     def from_session(cls, session: orm.Session) -> typing.Self:
@@ -66,22 +64,12 @@ class Participant(Base):
         primary_key=True,
         default=None,
     )
-    sex: orm.Mapped[fields.Sex | None] = orm.mapped_column(
-        sa.Enum(*typing.get_args(fields.Sex)), default=None
-    )
-    age: orm.Mapped[int | None] = orm.mapped_column(
-        sa.SmallInteger, default=None
-    )
-    handedness: orm.Mapped[int | None] = orm.mapped_column(
-        sa.Enum(*typing.get_args(fields.Handedness)), default=None
-    )
-    extra: orm.Mapped[dict | None] = orm.mapped_column(
-        sa.JSON, default_factory=sa.null
-    )
+    sex: orm.Mapped[fields.Sex | None] = orm.mapped_column(sa.Enum(*typing.get_args(fields.Sex)), default=None)
+    age: orm.Mapped[int | None] = orm.mapped_column(sa.SmallInteger, default=None)
+    handedness: orm.Mapped[int | None] = orm.mapped_column(sa.Enum(*typing.get_args(fields.Handedness)), default=None)
+    extra: orm.Mapped[dict | None] = orm.mapped_column(sa.JSON, default_factory=sa.null)
 
-    dataset: orm.Mapped[Dataset | None] = orm.relationship(
-        back_populates="participants", default=None
-    )
+    dataset: orm.Mapped[Dataset | None] = orm.relationship(back_populates="participants", default=None)
     sessions: orm.Mapped[list["Session"] | None] = orm.relationship(
         back_populates="participant",
         cascade="all, delete-orphan",
@@ -130,19 +118,11 @@ class Session(Base):
         primary_key=True,
         default=None,
     )
-    acq_time: orm.Mapped[datetime | None] = orm.mapped_column(
-        sa.DATETIME, default=None
-    )
-    extra: orm.Mapped[dict | None] = orm.mapped_column(
-        sa.JSON, default_factory=sa.null
-    )
+    acq_time: orm.Mapped[datetime | None] = orm.mapped_column(sa.DATETIME, default=None)
+    extra: orm.Mapped[dict | None] = orm.mapped_column(sa.JSON, default_factory=sa.null)
 
-    dataset: orm.Mapped[Dataset | None] = orm.relationship(
-        back_populates="sessions", default=None
-    )
-    participant: orm.Mapped[Participant | None] = orm.relationship(
-        back_populates="sessions", default=None
-    )
+    dataset: orm.Mapped[Dataset | None] = orm.relationship(back_populates="sessions", default=None)
+    participant: orm.Mapped[Participant | None] = orm.relationship(back_populates="sessions", default=None)
     files: orm.Mapped[list["File"]] = orm.relationship(
         back_populates="session",
         cascade="all, delete-orphan",
@@ -151,14 +131,8 @@ class Session(Base):
     )
 
     @classmethod
-    def from_session(
-        cls, session: orm.Session, id: str, participant_id: str
-    ) -> typing.Self:
-        ses = session.scalar(
-            sa.select(cls)
-            .where(cls.id == id)
-            .where(cls.participant_id == participant_id)
-        )
+    def from_session(cls, session: orm.Session, id: str, participant_id: str) -> typing.Self:
+        ses = session.scalar(sa.select(cls).where(cls.id == id).where(cls.participant_id == participant_id))
         if not isinstance(ses, cls):
             msg = f"Retrieved unexpected object: {ses=}"
             raise RuntimeError(msg)
@@ -190,9 +164,7 @@ class File(Base):
 
     path: orm.Mapped[str] = orm.mapped_column(primary_key=True)
 
-    dataset_id: orm.Mapped[str] = orm.mapped_column(
-        sa.ForeignKey("dataset.id", ondelete="CASCADE"), default=None
-    )
+    dataset_id: orm.Mapped[str] = orm.mapped_column(sa.ForeignKey("dataset.id", ondelete="CASCADE"), default=None)
     participant_id: orm.Mapped[str | None] = orm.mapped_column(
         sa.ForeignKey("participant.id", ondelete="CASCADE"), default=None
     )
@@ -207,9 +179,7 @@ class File(Base):
     space: orm.Mapped[str | None] = orm.mapped_column(default=None)
     den: orm.Mapped[str | None] = orm.mapped_column(default=None)
     res: orm.Mapped[str | None] = orm.mapped_column(default=None)
-    hemi: orm.Mapped[fields.Hemi | None] = orm.mapped_column(
-        sa.Enum(*typing.get_args(fields.Hemi)), default=None
-    )
+    hemi: orm.Mapped[fields.Hemi | None] = orm.mapped_column(sa.Enum(*typing.get_args(fields.Hemi)), default=None)
     bval: orm.Mapped[str | None] = orm.mapped_column(default=None)
     task: orm.Mapped[str | None] = orm.mapped_column(default=None)
     desc: orm.Mapped[str | None] = orm.mapped_column(default=None)
@@ -218,15 +188,9 @@ class File(Base):
     suffix: orm.Mapped[str | None] = orm.mapped_column(default=None)
     extension: orm.Mapped[str | None] = orm.mapped_column(default=None)
 
-    extra: orm.Mapped[dict | None] = orm.mapped_column(
-        sa.JSON, default_factory=sa.null
-    )
-    dataset: orm.Mapped[Dataset | None] = orm.relationship(
-        back_populates="files", default=None
-    )
-    participant: orm.Mapped[Participant | None] = orm.relationship(
-        back_populates="files", default=None
-    )
+    extra: orm.Mapped[dict | None] = orm.mapped_column(sa.JSON, default_factory=sa.null)
+    dataset: orm.Mapped[Dataset | None] = orm.relationship(back_populates="files", default=None)
+    participant: orm.Mapped[Participant | None] = orm.relationship(back_populates="files", default=None)
 
     # for details on primaryjoin, see
     # https://docs.sqlalchemy.org/en/20/orm/join_conditions.html#overlapping-foreign-keys
@@ -249,17 +213,11 @@ class File(Base):
 
     @classmethod
     def from_path_session(cls, src: Path, session: orm.Session) -> typing.Self:
-        return session.scalars(
-            sa.select(cls).where(cls.path == str(src.absolute()))
-        ).one()
+        return session.scalars(sa.select(cls).where(cls.path == str(src.absolute()))).one()
 
     @classmethod
-    def from_pathname_session(
-        cls, src: Path, session: orm.Session
-    ) -> typing.Self:
-        return session.scalars(
-            sa.select(cls).where(cls.path.contains(src.name))
-        ).one()
+    def from_pathname_session(cls, src: Path, session: orm.Session) -> typing.Self:
+        return session.scalars(sa.select(cls).where(cls.path.contains(src.name))).one()
 
 
 class FilePathMixin(orm.MappedAsDataclass):
@@ -274,15 +232,9 @@ class Scan(FilePathMixin, Base):
     __tablename__ = "scan"
 
     filename: orm.Mapped[str | None] = orm.mapped_column(default=None)
-    acq_time: orm.Mapped[datetime | None] = orm.mapped_column(
-        sa.DATETIME, default=None
-    )
-    extra: orm.Mapped[dict | None] = orm.mapped_column(
-        sa.JSON, default_factory=sa.null
-    )
-    file: orm.Mapped[File | None] = orm.relationship(
-        back_populates="scan", default=None
-    )
+    acq_time: orm.Mapped[datetime | None] = orm.mapped_column(sa.DATETIME, default=None)
+    extra: orm.Mapped[dict | None] = orm.mapped_column(sa.JSON, default_factory=sa.null)
+    file: orm.Mapped[File | None] = orm.relationship(back_populates="scan", default=None)
 
 
 class Anat(FilePathMixin, File):
@@ -297,18 +249,10 @@ class Event(Base):
 
     onset: orm.Mapped[float]
     duration: orm.Mapped[float]
-    extra: orm.Mapped[dict | None] = orm.mapped_column(
-        sa.JSON, default_factory=sa.null
-    )
-    func_path: orm.Mapped[str] = orm.mapped_column(
-        sa.ForeignKey("func.file_path"), primary_key=True, default=None
-    )
-    func: orm.Mapped[typing.Optional["Func"]] = orm.relationship(
-        back_populates="events", default=None
-    )
-    id: orm.Mapped[uuid.UUID] = orm.mapped_column(
-        primary_key=True, default_factory=uuid.uuid4
-    )
+    extra: orm.Mapped[dict | None] = orm.mapped_column(sa.JSON, default_factory=sa.null)
+    func_path: orm.Mapped[str] = orm.mapped_column(sa.ForeignKey("func.file_path"), primary_key=True, default=None)
+    func: orm.Mapped[typing.Optional["Func"]] = orm.relationship(back_populates="events", default=None)
+    id: orm.Mapped[uuid.UUID] = orm.mapped_column(primary_key=True, default_factory=uuid.uuid4)
 
 
 class FieldMap(FilePathMixin, File):
@@ -330,24 +274,16 @@ class Func(FilePathMixin, File):
         "polymorphic_identity": "func",
     }
 
-    events: orm.Mapped[list[Event] | None] = orm.relationship(
-        back_populates="func", default_factory=list
-    )
+    events: orm.Mapped[list[Event] | None] = orm.relationship(back_populates="func", default_factory=list)
 
     def read_events(self) -> list[Event]:
         path = Path(self.path)
-        event_path = path.parent / path.name.replace(
-            "bold.nii.gz", "events.tsv"
-        )
+        event_path = path.parent / path.name.replace("bold.nii.gz", "events.tsv")
         events_to_add: list[Event] = []
         if event_path.exists():
             events = (
                 pl.read_csv(event_path, separator="\t")
-                .with_columns(
-                    pl.struct(pl.all().exclude(["onset", "duration"])).alias(
-                        "extra"
-                    )
-                )
+                .with_columns(pl.struct(pl.all().exclude(["onset", "duration"])).alias("extra"))
                 .select("onset", "duration", "extra")
             )
             for event in events.iter_rows(named=True):
@@ -368,22 +304,15 @@ class B(Base):
     diffusion_path: orm.Mapped[str] = orm.mapped_column(
         sa.ForeignKey("diffusion.file_path"), primary_key=True, default=None
     )
-    dwi: orm.Mapped[typing.Optional["Diffusion"]] = orm.relationship(
-        back_populates="bvalbvecs", default=None
-    )
+    dwi: orm.Mapped[typing.Optional["Diffusion"]] = orm.relationship(back_populates="bvalbvecs", default=None)
 
     @classmethod
     def from_json(cls, dwi: "Diffusion", dwi_meta: Path) -> list[typing.Self]:
         if (bval_path := dwi_meta.with_suffix(".bval")).exists():
             bvals = [float(bval) for bval in bval_path.read_text().split()]
         if (bvec_path := dwi_meta.with_suffix(".bvec")).exists():
-            bvecs = [
-                [float(v) for v in line.split()]
-                for line in bvec_path.read_text().splitlines()
-            ]
-        df = pl.DataFrame(
-            {"b": bvals, "x": bvecs[0], "y": bvecs[1], "z": bvecs[2]}
-        ).with_row_index(name="tr")
+            bvecs = [[float(v) for v in line.split()] for line in bvec_path.read_text().splitlines()]
+        df = pl.DataFrame({"b": bvals, "x": bvecs[0], "y": bvecs[1], "z": bvecs[2]}).with_row_index(name="tr")
 
         out: list[typing.Self] = []
         for row in df.iter_rows(named=True):
@@ -402,9 +331,7 @@ class Diffusion(FilePathMixin, File):
         "polymorphic_identity": "dwi",
     }
 
-    bvalbvecs: orm.Mapped[list[B] | None] = orm.relationship(
-        back_populates="dwi", default_factory=list
-    )
+    bvalbvecs: orm.Mapped[list[B] | None] = orm.relationship(back_populates="dwi", default_factory=list)
 
 
 class Transform(FilePathMixin, File):

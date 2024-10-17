@@ -56,7 +56,6 @@ maps = (
 
 
 def main(root: Path, db: str):
-
     generators = []
     for job in root.glob("*/bids/*V[13]"):
         generators.append(job.glob("*dataset_description.json"))

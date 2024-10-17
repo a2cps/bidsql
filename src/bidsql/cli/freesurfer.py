@@ -33,9 +33,7 @@ maps = (
 
 def main(root: Path, db: str):
     generators = []
-    for job in root.glob(
-        "*/fmriprep/*V[13]/fmriprep/sourcedata/freesurfer/sub*"
-    ):
+    for job in root.glob("*/fmriprep/*V[13]/fmriprep/sourcedata/freesurfer/sub*"):
         generators.append(job.glob("*dataset_description.json"))
         generators.append(job.rglob("*"))
 

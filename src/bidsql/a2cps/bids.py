@@ -152,9 +152,7 @@ def parse_fmap(src: Path, session: orm.Session) -> None:
     files = []
     for ifor in utils.get_ifor_from_niigz(src):
         try:
-            files.append(
-                models.File.from_pathname_session(ifor, session=session)
-            )
+            files.append(models.File.from_pathname_session(ifor, session=session))
         except exc.NoResultFound:
             logging.warning(f"FieldMap target {ifor} not in database")
 
@@ -208,9 +206,7 @@ def parse_sessions(src: Path, session: orm.Session) -> None:
     sessions_tbl = (
         utils.read_bids_tsv(src)
         .with_columns(
-            pl.struct(
-                pl.all().exclude(["session_id", "sub", "acquisition_week"])
-            ).alias("extra"),
+            pl.struct(pl.all().exclude(["session_id", "sub", "acquisition_week"])).alias("extra"),
         )
         .select("session_id", "sub", "acquisition_week", "extra")
         .with_columns(
@@ -279,12 +275,8 @@ def parse_participants(src: Path, session: orm.Session) -> None:
     parse_file(src=src, session=session)
 
 
-def get_file_from_scans_filename(
-    filename: str, session: orm.Session
-) -> models.File | None:
-    return session.scalar(
-        sa.select(models.File).where(models.File.path.endswith(filename))
-    )
+def get_file_from_scans_filename(filename: str, session: orm.Session) -> models.File | None:
+    return session.scalar(sa.select(models.File).where(models.File.path.endswith(filename)))
 
 
 def parse_scans(src: Path, session: orm.Session) -> None:
@@ -303,9 +295,7 @@ def parse_scans(src: Path, session: orm.Session) -> None:
         toplevel = ["filename"]
 
     if not all(col in toplevel for col in scans_tbl.columns):
-        scans_tbl = scans_tbl.with_columns(
-            pl.struct(pl.all().exclude(toplevel)).alias("extra")
-        )
+        scans_tbl = scans_tbl.with_columns(pl.struct(pl.all().exclude(toplevel)).alias("extra"))
 
     for scan in scans_tbl.iter_rows(named=True):
         filename = utils.get_key_str(scan, "filename")

@@ -20,7 +20,6 @@ maps = [
 
 
 def main(root: Path, db: str):
-
     generators = []
     for job in root.glob("*/fmriprep/*V[13]/synthstrip"):
         generators.append(job.rglob("*"))
