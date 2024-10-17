@@ -135,3 +135,8 @@ tests = ["tests", "*/bidsql/tests"]
 
 [tool.coverage.report]
 exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.uv]
+dev-dependencies = [
+    "pre-commit>=4.0.1",
+]
