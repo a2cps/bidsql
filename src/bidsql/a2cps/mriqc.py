@@ -1,10 +1,10 @@
-from pathlib import Path
 import json
 import typing
+from pathlib import Path
 
 from sqlalchemy import orm
 
-from bidsql import models, utils, mapping
+from bidsql import mapping, models, utils
 
 
 def get_iqm_from_json(src: Path) -> dict[str, typing.Any]:

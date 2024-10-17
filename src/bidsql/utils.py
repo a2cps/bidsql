@@ -1,10 +1,10 @@
 import json
-import typing
 import re
+import typing
 from pathlib import Path
 
-import sqlalchemy as sa
 import polars as pl
+import sqlalchemy as sa
 
 
 def parse_entity(src: str, entity: str) -> str | None:

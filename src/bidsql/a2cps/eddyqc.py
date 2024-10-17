@@ -1,10 +1,10 @@
-from pathlib import Path
-import typing
 import json
+import typing
+from pathlib import Path
 
 from sqlalchemy import orm
 
-from bidsql import models, utils, mapping
+from bidsql import mapping, models, utils
 from bidsql.a2cps import utils as a2cps_utils
 
 

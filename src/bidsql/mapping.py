@@ -1,17 +1,16 @@
+import logging
+import re
+import typing
 from collections import abc
 from pathlib import Path
-import typing
-import re
-import logging
 
 import pydantic
 import sqlalchemy as sa
-from sqlalchemy import orm, exc
+from sqlalchemy import exc, orm
 
 from bidsql import models
 
-
-Parser: typing.TypeAlias = typing.Callable[[Path, orm.Session], None]
+type Parser = typing.Callable[[Path, orm.Session], None]
 
 
 class File(pydantic.BaseModel):
@@ -53,7 +52,6 @@ class Mapper(pydantic.BaseModel):
 
 def parse_nothing(src: Path, _: orm.Session) -> None:
     logging.info(f"Skipping {src}")
-    pass
 
 
 def is_file_in_session(src: Path, session: orm.Session) -> bool:
@@ -90,12 +88,11 @@ def get_add_participant_session(
     session_id: str | None = None,
 ) -> tuple[models.Participant | None, models.Session | None]:
     dataset = models.Dataset.from_session(session)
-    if participant_id:
-        participant = upsert_participant(
-            session, id=participant_id, dataset=dataset
-        )
-    else:
-        participant = None
+    participant = (
+        upsert_participant(session, id=participant_id, dataset=dataset)
+        if participant_id
+        else None
+    )
     if participant and session_id:
         ses = upsert_session(
             session,

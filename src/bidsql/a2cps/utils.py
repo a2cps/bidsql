@@ -1,7 +1,7 @@
-from pathlib import Path
 import re
+from pathlib import Path
 
-from bidsql import utils, models
+from bidsql import models, utils
 
 
 def search_for_entity(src: Path, pattern: str) -> str | None:
@@ -32,7 +32,7 @@ def parse_a2cps_entities(src: Path) -> dict[str, str]:
 
 def get_dataset_name(src: Path) -> str:
     name = re.findall(r"\w{2}\d{5}V[13]", str(src))
-    if not len(name) == 1:
+    if len(name) != 1:
         msg = f"Unable to extract name from {src}"
         raise AssertionError(msg)
     return name[0]
@@ -40,5 +40,4 @@ def get_dataset_name(src: Path) -> str:
 
 def get_dataset(src: Path) -> models.Dataset:
     dsname = get_dataset_name(src)
-    dataset = models.Dataset(bids_version="", name=dsname)
-    return dataset
+    return models.Dataset(bids_version="", name=dsname)

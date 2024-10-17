@@ -1,17 +1,16 @@
-from pathlib import Path
 import typing
+from pathlib import Path
 
 import polars as pl
 import polars.selectors as cs
-
 from sqlalchemy import orm
 
-from bidsql import models, utils, mapping
+from bidsql import mapping, models, utils
 
 
 def get_iqm(src: Path) -> dict[str, typing.Any]:
     iqms = pl.read_csv(src).drop(cs.ends_with("_id")).drop("file_name").to_dicts()
-    if not (nrows := len(iqms)) == 1:
+    if (nrows := len(iqms)) != 1:
         msg = f"{src} has {nrows} rows but expected 1"
         raise AssertionError(msg)
     return iqms[0]
